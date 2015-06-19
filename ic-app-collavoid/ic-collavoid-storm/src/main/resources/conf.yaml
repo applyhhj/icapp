@@ -1,0 +1,78 @@
+#zk.root: "/iot/sensors"
+ic.servers: ["localhost:9090"]
+spouts:
+    odometry_receiver:
+        type: "normal"
+        metaFields: ["agentIndex"]
+        dataField: "odometry"
+        builder: thu.ic.collavoid.commons.ic.SpoutMessageBuilder
+        properties:
+          #ackMode: "auto"
+          prefectCount: "10"
+    scan_receiver:
+        type:"normal"
+        metaFields: ["agentIndex"]
+        dataField: "scan"
+        builder: thu.ic.collavoid.commons.ic.SpoutMessageBuilder
+        properties:
+          #ackMode: "auto"
+          prefectCount: "10"
+    pose_array_receiver:
+        type:"normal"
+        metaFields: ["agentIndex"]
+        dataField: "pose_array"
+        builder: thu.ic.collavoid.commons.ic.SpoutMessageBuilder
+        properties:
+          #ackMode: "auto"
+          prefectCount: "10"
+    command_receiver:
+        type:"normal"
+        metaFields: ["agentIndex"]
+        dataField: "baseConfig"
+        builder: thu.ic.collavoid.commons.ic.SpoutMessageBuilder
+        properties:
+          #ackMode: "auto"
+          prefectCount: "10"
+    pose_share_out_receiver:
+        type: "fixed"
+        # if there is any, must be specified!!
+        metaFields: ["time","sessionId"]
+        dataField: "poseShare"
+        builder: thu.ic.collavoid.commons.ic.SpoutMessageBuilder
+        transport:
+            name: rabbitmq
+            context:
+                exchange: "pose_share"
+                routingKey: "pose_share"
+                exchangeType: "topic"
+        properties:
+          #ackMode: "auto"
+          prefectCount: "10"
+bolts:
+    vel_cmd_sender:
+        type: "normal"
+        dataField: "velocityCommand"
+        builder: thu.ic.collavoid.commons.ic.BoltMessageBuilder
+        properties:
+          #ackMode: "auto"
+    pose_share_in_sender:
+        type: "fixed"
+        metaFields: ["time","sessionId"]
+        dataField: "poseShare"
+        builder: thu.ic.collavoid.commons.ic.BoltMessageBuilder
+        transport:
+            name: rabbitmq
+            context:
+                exchange: "pose_share"
+                routingKey: "pose_share"
+                exchangeType: "topic"
+        properties:
+          #ackMode: "auto"
+
+# Normal components are used to interface with ICCloud.
+# For normal component, there are four basic meta fields: time, message id, module id, session id. All meta field
+# configured in normal component will be added to those basic meta fields. Meta fields should be basic types, and are
+# added into transport message hearder, only data field is serialized/deserialized as message payload.
+# Meta fields for fixed component if optional. If meta fields are specified in the file, only those fields will be
+# treated as headers and no more field will be added.
+# Data field is required for all component.

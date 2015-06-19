@@ -1,0 +1,68 @@
+#zk.servers: ["nz:2181"]
+zk.servers: ["localhost:2181"]
+#zk.servers: ["hjh-lab:2181"]
+zk.root: "/iot/sensors"
+spouts:
+    odometry_receiver:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "odometry"
+        fields: ["time","sensorID","odometry","agentIndex"]
+        builder: SpoutMessageBuilder
+        properties:
+          ackMode: "auto"
+          prefectCount: "10"
+    scan_receiver:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "scan"
+        fields: ["time","sensorID","scan","agentIndex"]
+        builder: SpoutMessageBuilder
+        properties:
+          ackMode: "auto"
+          prefectCount: "10"
+    pose_array_receiver:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "pose_array"
+        fields: ["time","sensorID","pose_array","agentIndex"]
+        builder: SpoutMessageBuilder
+        properties:
+          ackMode: "auto"
+          prefectCount: "10"
+    command_receiver:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "command"
+        ###################fields: ["time","sensorID","commandMap","agentIndex"]
+        fields: ["time","sensorID","baseConfig","agentIndex"]
+        builder: SpoutMessageBuilder
+        properties:
+          ackMode: "auto"
+          prefectCount: "10"
+    pose_share_out_receiver:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel:"pose_share_out"
+        fields: ["time","sensorID","poseShare"]
+        builder: SpoutMessageBuilder
+        properties:
+          ackMode: "auto"
+          prefectCount: "10"
+bolts:
+    vel_cmd_sender:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "vel_cmd"
+        fields: ["time","sensorID","velocityCommand"]
+        builder: BoltMessageBuilder
+        properties:
+          ackMode: "auto"
+    pose_share_in_sender:
+        broker: "rabbitmq"
+        sensor: "collisionAvoid"
+        channel: "pose_share_in"
+        fields: ["time","sensorID","poseShare"]
+        builder: BoltMessageBuilder
+        properties:
+          ackMode: "auto"
